@@ -3,6 +3,8 @@ Reproducible Research - Peer Assignment 1
 
 ```{r simulation, echo=FALSE, results='hide'}
 library(ggplot2)
+library(gam)
+library(data.table)
 ```
 
 Given below are the steps undertaken for completion of peer assignment 1:
@@ -39,4 +41,53 @@ Step 4: Time series plot of interval vs average number of steps
 ```{r}
 tsplot <- aggregate(steps~interval, mean, data=act, na.rm=TRUE)
 ggplot( data = tsplot, aes( interval, steps )) + geom_line() 
+```
+
+Observation: 
+============
+It is observed that there is a spike in the number of steps for the duration of around 550.
+
+Step 5: Number of missing values in the dataset
+
+```{r}
+sum(is.na(act))
+```
+
+Step 6: Replace missing values for steps with the mean of the non-missings using the na.gam.replace function. 
+
+The new dataset is act2. The count of missing values in the new data frame is observed to be 0.
+
+```{r}
+act2 <- na.gam.replace(act)
+sum(is.na(act2))
+```
+
+Step 7: Histogram of total number of steps taken per day using the new data frame:
+
+```{r,  results='hide'}
+aggrnew <- aggregate(steps~date, sum, data=act2)
+```
+```{r, fig.width=10}
+ggplot(aggrnew,aes(x=date,y=steps))+geom_bar(stat='identity')+ theme(axis.text.x=element_text(angle=-90))
+```
+
+Observation: 
+============
+It is observed that the number of observations plotted on the histogram has increased. 
+
+Step 8: Adding the Weekday Column.
+
+```{r}
+act3 <- act2
+act3$wkdy <- weekdays(as.Date(act3$date))
+act4 <- data.table(act3)
+act4[, WkDay := ifelse(wkdy %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"), "Weekday",
+                      ifelse(wkdy %in% c("Saturday", "Sunday"), "Weekend",
+                              NA))]
+```
+
+Step 9: Plot of Weekday vs Weekend
+
+```{r}
+ggplot( data = act4, aes( interval, steps )) + geom_line() +  facet_wrap(~ WkDay, nrow=2, ncol=1) 
 ```
