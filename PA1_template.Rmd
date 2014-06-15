@@ -1,20 +1,42 @@
-# Reproducible Research: Peer Assessment 1
+Reproducible Research - Peer Assignment 1 
+========================================================
 
+```{r simulation, echo=FALSE, results='hide'}
+library(ggplot2)
+```
 
-## Loading and preprocessing the data
+Given below are the steps undertaken for completion of peer assignment 1:
 
+Step 1: Load the data
 
+```{r}
+setwd("C:/Sriraman/B D/5 Reproducible Research/Week 2/repdata-data-activity")
+act <- read.csv("activity.csv",header=TRUE)
+```
 
-## What is mean total number of steps taken per day?
+Step 2: Finding out the mean total number of steps taken per day
 
+Histogram of total number of steps taken per day:
 
+```{r,  results='hide'}
+aggr <- aggregate(steps~date, sum, data=act)
+```
+```{r, fig.width=10}
+ggplot(aggr,aes(x=date,y=steps))+geom_bar(stat='identity')+ theme(axis.text.x=element_text(angle=-90))
+```
 
-## What is the average daily activity pattern?
+Step 3: Calculate and report the mean total number of steps taken per day
 
+Following table shows the mean total number of steps taken per day or all days having valid values.
 
+```{r}
+meanact <- aggregate(steps~date, mean, data=act, na.rm=TRUE)
+meanact
+```
 
-## Imputing missing values
+Step 4: Time series plot of interval vs average number of steps
 
-
-
-## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+tsplot <- aggregate(steps~interval, mean, data=act, na.rm=TRUE)
+ggplot( data = tsplot, aes( interval, steps )) + geom_line() 
+```
